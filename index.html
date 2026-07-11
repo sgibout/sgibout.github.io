@@ -1,278 +1,162 @@
 <!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.8.0">
-  <meta charset="utf-8">
-  
-  <title>GloubiBoulgaBlog</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Ce que je raconte ici n&apos;engage que moi !">
-<meta property="og:type" content="website">
-<meta property="og:title" content="GloubiBoulgaBlog">
-<meta property="og:url" content="http://sgibout.github.io/index.html">
-<meta property="og:site_name" content="GloubiBoulgaBlog">
-<meta property="og:description" content="Ce que je raconte ici n&apos;engage que moi !">
-<meta property="og:locale" content="fr">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="GloubiBoulgaBlog">
-<meta name="twitter:description" content="Ce que je raconte ici n&apos;engage que moi !">
-<meta name="twitter:creator" content="@sgibout">
-  
-    <link rel="alternate" href="/atom.xml" title="GloubiBoulgaBlog" type="application/atom+xml">
-  
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
-
-  <link rel="stylesheet" href="/css/styles.css">
-  
-<!-- Google Analytics -->
-<script type="text/javascript">
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-47424353-5', 'auto');
-ga('send', 'pageview');
-
-</script>
-<!-- End Google Analytics -->
-
-
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animation 3D</title>
+<style>
+  body { margin: 0; overflow: hidden; background: #000; }
+  canvas { display: block; }
+</style>
 </head>
-</html>
 <body>
-  <nav class="navbar navbar-inverse">
-  <div class="container">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      
-    </div>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="main-menu-navbar">
-      <ul class="nav navbar-nav">
-        
-          <li><a class="active" href="/index.html">Home</a></li>
-        
-          <li><a class="" href="/archives/">Archives</a></li>
-        
-      </ul>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
+camera.position.z = 30;
 
-      <!--
-      <ul class="nav navbar-nav navbar-right">
-        
-          <li><a href="/atom.xml" title="RSS Feed"><i class="fa fa-rss"></i></a></li>
-        
-      </ul>
-      -->
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-</nav>
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
 
-  <div class="container">
-    <div class="blog-header">
-  <h1 class="blog-title">GloubiBoulgaBlog</h1>
-  
-    <p class="lead blog-description">Pour y mettre un peu tout et n&#39;importe quoi...</p>
-  
-</div>
+const colors = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6bdf'];
 
-    <div class="row">
-        <div class="col-sm-8 blog-main">
-          
-  
-    <article id="post-support-m2s" class="article article-type-post" itemscope="" itemprop="blogPost">
+// --- Main torus knot ---
+const torusGeo = new THREE.TorusKnotGeometry(6, 2, 180, 24);
+const torusMat = new THREE.MeshPhysicalMaterial({
+  color: '#4d96ff',
+  metalness: 0.3,
+  roughness: 0.1,
+  wireframe: false,
+  emissive: '#1a3a7a',
+  emissiveIntensity: 0.3,
+  clearcoat: 0.5,
+});
+const torus = new THREE.Mesh(torusGeo, torusMat);
+scene.add(torus);
 
-  <header class="article-header">
-    
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/10/25/support-m2s/">Modélisation Numérique</a>
-    </h1>
-  
+// --- Wireframe overlay ---
+const wireGeo = new THREE.TorusKnotGeometry(6.1, 2, 180, 24);
+const wireMat = new THREE.MeshBasicMaterial({
+  color: '#88ccff',
+  wireframe: true,
+  transparent: true,
+  opacity: 0.15,
+});
+const wire = new THREE.Mesh(wireGeo, wireMat);
+scene.add(wire);
 
+// --- Orbiting rings ---
+for (let i = 0; i < 3; i++) {
+  const r = new THREE.Mesh(
+    new THREE.TorusGeometry(9 + i * 1.5, 0.03, 16, 100),
+    new THREE.MeshBasicMaterial({ color: colors[i], transparent: true, opacity: 0.3 })
+  );
+  r.rotation.x = Math.PI / 2 + (i * Math.PI / 6);
+  r.rotation.y = i * Math.PI / 4;
+  scene.add(r);
+}
 
-  </header>
+// --- Particles ---
+const count = 2000;
+const positions = new Float32Array(count * 3);
+const particleColors = new Float32Array(count * 3);
+for (let i = 0; i < count; i++) {
+  const radius = 12 + Math.random() * 12;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2 * Math.random() - 1);
+  positions[i*3] = radius * Math.sin(phi) * Math.cos(theta);
+  positions[i*3+1] = radius * Math.sin(phi) * Math.sin(theta);
+  positions[i*3+2] = radius * Math.cos(phi);
+  const c = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
+  particleColors[i*3] = c.r;
+  particleColors[i*3+1] = c.g;
+  particleColors[i*3+2] = c.b;
+}
+const particleGeo = new THREE.BufferGeometry();
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+particleGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+const particleMat = new THREE.PointsMaterial({
+  size: 0.15,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.8,
+  blending: THREE.AdditiveBlending,
+});
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
 
-  <div class="article-meta">
-    <div class="article-datetime">
-  <a href="/2018/10/25/support-m2s/" class="article-date"><time datetime="2018-10-25T16:26:32.000Z" itemprop="datePublished">25/10/2018</time></a>
-</div>
+// --- Little floating dots inside ---
+const innerCount = 800;
+const innerPos = new Float32Array(innerCount * 3);
+for (let i = 0; i < innerCount; i++) {
+  const r = Math.random() * 5;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2 * Math.random() - 1);
+  innerPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+  innerPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+  innerPos[i*3+2] = r * Math.cos(phi);
+}
+const innerGeo = new THREE.BufferGeometry();
+innerGeo.setAttribute('position', new THREE.BufferAttribute(innerPos, 3));
+const innerMat = new THREE.PointsMaterial({
+  size: 0.08,
+  color: '#88ccff',
+  transparent: true,
+  opacity: 0.4,
+  blending: THREE.AdditiveBlending,
+});
+const innerParticles = new THREE.Points(innerGeo, innerMat);
+scene.add(innerParticles);
 
-    
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/ensgti/">ensgti</a>
-  </div>
+// --- Resize ---
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
 
+// --- Mouse interaction ---
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', (e) => {
+  mouseX = (e.clientX / innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / innerHeight - 0.5) * 2;
+});
 
-  </div>
-  <div class="article-inner">
+// --- Animate ---
+const clock = new THREE.Clock();
+function animate() {
+  const t = clock.getElapsedTime();
 
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Juste pour faire un petit essai, voici le lien permettant d’accéder au support de cours de <strong>Modélisation Numérique</strong> que subissent les élèves-ingénieurs énergéticiens de l’<a href="http://ensgti.univ-pau.fr" target="_blank" rel="noopener">ENSGTI</a>.</p>
-<p>Bonne lecture !</p>
-<p><img src="/pdf/modnum.pdf" alt="ici"></p>
+  torus.rotation.x = t * 0.2;
+  torus.rotation.y = t * 0.3;
+  wire.rotation.x = t * 0.2;
+  wire.rotation.y = t * 0.3;
 
-      
-    </div>
+  particles.rotation.x = t * 0.015;
+  particles.rotation.y = t * 0.02;
+  innerParticles.rotation.x = t * 0.03;
+  innerParticles.rotation.y = t * 0.04;
 
-    
-      
+  torus.position.x = mouseX * 2;
+  torus.position.y = -mouseY * 2;
+  wire.position.x = mouseX * 2;
+  wire.position.y = -mouseY * 2;
 
-    
-
-    <footer class="article-footer">
-      <a data-url="http://sgibout.github.io/2018/10/25/support-m2s/" data-id="cjnotam920001opvefbgfnlxy" class="article-share-link">
-        <i class="fa fa-share"></i> Share
-      </a>
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope="" itemprop="blogPost">
-
-  <header class="article-header">
-    
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/10/25/hello-world/">Bonjour !</a>
-    </h1>
-  
-
-
-  </header>
-
-  <div class="article-meta">
-    <div class="article-datetime">
-  <a href="/2018/10/25/hello-world/" class="article-date"><time datetime="2018-10-25T14:31:23.708Z" itemprop="datePublished">25/10/2018</time></a>
-</div>
-
-    
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/vrac/">vrac</a>
-  </div>
-
-
-  </div>
-  <div class="article-inner">
-
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Mon tout premier post.</p>
-<p>Pas d’ambition démesurée ! C’est juste pour pouvoir y déposer quelques documents</p>
-
-      
-    </div>
-
-    
-      
-
-    
-
-    <footer class="article-footer">
-      <a data-url="http://sgibout.github.io/2018/10/25/hello-world/" data-id="cjnotam8y0000opvexjgi0m2b" class="article-share-link">
-        <i class="fa fa-share"></i> Share
-      </a>
-      
-      
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-
-
-
-
-        </div>
-        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
-          
-  
-  <div class="sidebar-module">
-    <h4>Catégories</h4>
-    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/ensgti/">ensgti</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/vrac/">vrac</a><span class="sidebar-module-list-count">1</span></li></ul>
-  </div>
-
-
-
-  
-
-
-  
-
-  
-  <div class="sidebar-module">
-    <h4>Archives</h4>
-    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2018/10/">octobre 2018</a><span class="sidebar-module-list-count">2</span></li></ul>
-  </div>
-
-
-
-  
-  <div class="sidebar-module">
-    <h4>Récemment</h4>
-    <ul class="sidebar-module-list">
-      
-        <li>
-          <a href="/2018/10/25/support-m2s/">Modélisation Numérique</a>
-        </li>
-      
-        <li>
-          <a href="/2018/10/25/hello-world/">Bonjour !</a>
-        </li>
-      
-    </ul>
-  </div>
-
-
-
-        </div>
-    </div>
-  </div>
-  <footer class="blog-footer">
-  <div class="container">
-    <div id="footer-info" class="inner">
-      &copy; 2018 S. Gibout<br>
-      Propulsé par <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-
-  
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
-
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-
-
-
-<script src="/js/script.js"></script>
-
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
 </body>
 </html>
